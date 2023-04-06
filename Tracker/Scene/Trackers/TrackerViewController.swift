@@ -5,6 +5,17 @@
 import Foundation
 import UIKit
 
+extension TrackerViewController: TrackerPresenterProtocol, UISearchBarDelegate, UISearchControllerDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        print("Search: \(searchText)")
+    }
+
+    @objc func changeDate(sender: UIDatePicker) {
+        print("Change date: \(sender.date)")
+        presentedViewController?.dismiss(animated: false, completion: nil)
+    }
+}
+
 class TrackerViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -12,10 +23,12 @@ class TrackerViewController: UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.title = tabBarItem.title
 
-        let createButton = CreateTrackerButton(presenter: self).register()
-        let searchController = SearchController(presenter: self).register()
         let datePicker = DatePickerController(presenter: self).register()
-        let collection = CollectionTracker(presenter: self).register()
+        CreateTrackerButton(presenter: self).register()
+        SearchController(presenter: self).register()
+        CollectionTracker(presenter: self).register()
+
+        datePicker.picker.addTarget(self, action: #selector(changeDate(sender:)), for: .valueChanged)
     }
 
     override var tabBarItem: UITabBarItem! {
