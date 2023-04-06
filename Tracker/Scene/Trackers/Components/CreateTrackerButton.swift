@@ -5,7 +5,19 @@
 import Foundation
 import UIKit
 
-class CreateTrackerButton: UIBarButtonItem {
+// MARK: - Action
+
+extension CreateTrackerButton {
+    @objc func tapAction() {
+        let controllerView = UIViewController()
+        controllerView.view.backgroundColor = .orange
+        presenter.present(controllerView, animated: true)
+    }
+}
+
+// MARK: - Default initialize
+
+final class CreateTrackerButton: UIBarButtonItem {
     private let presenter: UIViewController
 
     override var style: Style {
@@ -37,13 +49,5 @@ class CreateTrackerButton: UIBarButtonItem {
     func register() -> Self {
         presenter.navigationItem.leftBarButtonItem = self
         return self
-    }
-}
-
-// MARK: - Action
-
-extension CreateTrackerButton {
-    @objc func tapAction() {
-        print("Tap create button 2")
     }
 }

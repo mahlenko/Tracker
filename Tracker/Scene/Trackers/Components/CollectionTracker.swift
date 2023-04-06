@@ -5,37 +5,41 @@
 import Foundation
 import UIKit
 
-class CollectionTracker: NSObject {
+extension CollectionTracker {
+    func showEmptyDataView(visible: Bool) {
+        emptyDataView.isHidden = !visible
+    }
+}
+
+final class CollectionTracker: NSObject {
     public let collection = UICollectionView(
         frame: .zero,
         collectionViewLayout: UICollectionViewFlowLayout())
 
-    private let presenter: UIViewController
+    private let presenter: TrackerPresenterProtocol
 
     private let emptyDataView: UIView = UIView()
 
-    init(presenter: UIViewController) {
+    init(presenter: TrackerPresenterProtocol) {
         self.presenter = presenter
     }
 
     func register() -> Self {
-        presenter.view.addSubview(collection)
-        collection.translatesAutoresizingMaskIntoConstraints = false
+        if let presenter = presenter as? UIViewController {
+            presenter.view.addSubview(collection)
+            collection.translatesAutoresizingMaskIntoConstraints = false
 
-        NSLayoutConstraint.activate([
-            collection.topAnchor.constraint(equalTo: presenter.view.topAnchor),
-            collection.bottomAnchor.constraint(equalTo: presenter.view.safeAreaLayoutGuide.bottomAnchor),
-            collection.leadingAnchor.constraint(equalTo: presenter.view.safeAreaLayoutGuide.leadingAnchor),
-            collection.trailingAnchor.constraint(equalTo: presenter.view.safeAreaLayoutGuide.trailingAnchor)
-        ])
+            NSLayoutConstraint.activate([
+                collection.topAnchor.constraint(equalTo: presenter.view.topAnchor),
+                collection.bottomAnchor.constraint(equalTo: presenter.view.safeAreaLayoutGuide.bottomAnchor),
+                collection.leadingAnchor.constraint(equalTo: presenter.view.safeAreaLayoutGuide.leadingAnchor),
+                collection.trailingAnchor.constraint(equalTo: presenter.view.safeAreaLayoutGuide.trailingAnchor)
+            ])
 
-        createEmptyDataView(message: "Что будем отслеживать?")
+            createEmptyDataView(message: "Что будем отслеживать?")
+        }
 
         return self
-    }
-
-    func showEmptyDataView(visible: Bool) {
-        emptyDataView.isHidden = !visible
     }
 
     private func createEmptyDataView(message: String) {
@@ -54,12 +58,14 @@ class CollectionTracker: NSObject {
 
         collection.backgroundView = emptyDataView
 
-        NSLayoutConstraint.activate([
-            emptyDataView.centerXAnchor.constraint(equalTo: presenter.view.centerXAnchor),
-            emptyDataView.centerYAnchor.constraint(equalTo: presenter.view.centerYAnchor),
-            textLabel.centerXAnchor.constraint(equalTo: collection.centerXAnchor),
-            imageNoData.centerXAnchor.constraint(equalTo: collection.centerXAnchor),
-            textLabel.topAnchor.constraint(equalTo: imageNoData.bottomAnchor, constant: 8)
-        ])
+        if let presenter = presenter as? UIViewController {
+            NSLayoutConstraint.activate([
+                emptyDataView.centerXAnchor.constraint(equalTo: presenter.view.centerXAnchor),
+                emptyDataView.centerYAnchor.constraint(equalTo: presenter.view.centerYAnchor),
+                textLabel.centerXAnchor.constraint(equalTo: collection.centerXAnchor),
+                imageNoData.centerXAnchor.constraint(equalTo: collection.centerXAnchor),
+                textLabel.topAnchor.constraint(equalTo: imageNoData.bottomAnchor, constant: 8)
+            ])
+        }
     }
 }

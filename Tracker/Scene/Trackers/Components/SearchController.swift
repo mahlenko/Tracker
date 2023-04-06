@@ -5,17 +5,18 @@
 import Foundation
 import UIKit
 
-class SearchController: NSObject {
+// MARK: - Default initialize
+
+final class SearchController: NSObject {
     public let controller: UISearchController = UISearchController()
-    private var searchBar: UISearchBar = UISearchBar()
     private let presenter: UIViewController
 
     init(presenter: UIViewController) {
         self.presenter = presenter
 
         super.init()
-        controller.delegate = self
-        searchBar.delegate = self
+        controller.delegate = presenter as? UISearchControllerDelegate
+        controller.searchBar.delegate = presenter as? UISearchBarDelegate
 
         controller.hidesNavigationBarDuringPresentation = false
     }
@@ -25,7 +26,3 @@ class SearchController: NSObject {
         return self
     }
 }
-
-extension SearchController: UISearchControllerDelegate {}
-
-extension SearchController: UISearchBarDelegate {}
