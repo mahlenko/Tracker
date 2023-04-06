@@ -5,8 +5,10 @@
 import Foundation
 import UIKit
 
-class DatePickerController: NSObject {
-    public let datePicker = UIDatePicker()
+// MARK: - Default initialize
+
+final class DatePickerController: NSObject {
+    public let picker = UIDatePicker()
     private let presenter: UIViewController
 
     init(presenter: UIViewController) {
@@ -15,16 +17,28 @@ class DatePickerController: NSObject {
     }
 
     func register() -> Self {
-        presenter.navigationItem.rightBarButtonItem = UIBarButtonItem(
-                customView: datePicker)
+        presenter.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: picker)
 
-        datePicker.datePickerMode = .date
-        datePicker.preferredDatePickerStyle = .compact
+        picker.datePickerMode = .date
+        picker.preferredDatePickerStyle = .compact
 
         NSLayoutConstraint.activate([
-            datePicker.widthAnchor.constraint(equalToConstant: 110)
+            picker.widthAnchor.constraint(equalToConstant: 100)
         ])
 
+        addStyle(view: picker)
+
         return self
+    }
+
+    private func addStyle(view: UIView) {
+        for view in view.subviews {
+            if let label = view as? UILabel {
+                label.font = UIFont.systemFont(ofSize: 17)
+                break
+            } else {
+                addStyle(view: view)
+            }
+        }
     }
 }
