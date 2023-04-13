@@ -5,6 +5,6 @@
 import Foundation
 
 struct Category {
-    let id: UUID
+    let uuid: UUID
     let name: String
 }

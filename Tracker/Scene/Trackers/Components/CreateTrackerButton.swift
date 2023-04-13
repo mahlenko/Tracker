@@ -46,8 +46,7 @@ final class CreateTrackerButton: UIBarButtonItem {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func register() -> Self {
+    func register() {
         presenter.navigationItem.leftBarButtonItem = self
-        return self
     }
 }

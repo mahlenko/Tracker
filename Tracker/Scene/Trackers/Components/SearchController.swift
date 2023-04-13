@@ -21,8 +21,7 @@ final class SearchController: NSObject {
         controller.hidesNavigationBarDuringPresentation = false
     }
 
-    func register() -> Self {
+    func register() {
         presenter.navigationItem.searchController = controller
-        return self
     }
 }

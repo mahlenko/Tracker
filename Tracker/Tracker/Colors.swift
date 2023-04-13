@@ -5,7 +5,7 @@
 import Foundation
 import UIKit
 
-enum Colors: Int {
+enum Colors: Int, CaseIterable {
     case pinkRed = 0xFD4C49
     case orange = 0xFF881E
     case blue = 0x007BFA

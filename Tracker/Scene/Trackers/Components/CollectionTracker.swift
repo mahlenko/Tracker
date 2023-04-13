@@ -20,14 +20,28 @@ final class CollectionTracker: NSObject {
 
     private let emptyDataView: UIView = UIView()
 
+    private var items: [UUID: [Tracker]]?
+
     init(presenter: TrackerPresenterProtocol) {
         self.presenter = presenter
     }
 
-    func register() -> Self {
+    func register(by items: [UUID: [Tracker]]? = nil) -> Self {
         if let presenter = presenter as? UIViewController {
             presenter.view.addSubview(collection)
             collection.translatesAutoresizingMaskIntoConstraints = false
+
+            collection.delegate = presenter as? UICollectionViewDelegate
+            collection.dataSource = presenter as? UICollectionViewDataSource
+
+            collection.register(
+                TrackerCell.self,
+                forCellWithReuseIdentifier: TrackerCell.identifier)
+
+            collection.register(
+                TrackerHeaderCollection.self,
+                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                withReuseIdentifier: TrackerHeaderCollection.identifier)
 
             NSLayoutConstraint.activate([
                 collection.topAnchor.constraint(equalTo: presenter.view.topAnchor),
