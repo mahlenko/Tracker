@@ -19,7 +19,6 @@ final class TrackerCell: UICollectionViewCell {
     private var tracker: Tracker?
 
     func setupForTracking(tracker: Tracker) {
-
         self.tracker = tracker
 
         // add subviews
@@ -80,6 +79,7 @@ final class TrackerCell: UICollectionViewCell {
     @objc func trackerCompleted(_ sender: UIButton) {
         tracker?.completed(date: Date())
         completedLabel.text = (tracker?.completeAt.count)?.toStringChoice("день", "дня", "дней")
+        UISelectionFeedbackGenerator().selectionChanged()
     }
 
     private func configureConstraints() {

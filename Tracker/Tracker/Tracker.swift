@@ -4,7 +4,7 @@
 
 import Foundation
 
-struct Tracker {
+class Tracker {
     let id: UUID
     let name: String
     let categoryUuid: UUID
@@ -13,7 +13,25 @@ struct Tracker {
     let color: Colors
     var completeAt: [Date] = []
 
-    mutating func completed(date: Date) {
+    init(
+        id: UUID,
+        name: String,
+        categoryUuid: UUID,
+        schedule: [WeekDay]?,
+        emoji: String,
+        color: Colors,
+        completeAt: [Date] = []
+    ) {
+        self.id = id
+        self.name = name
+        self.categoryUuid = categoryUuid
+        self.schedule = schedule
+        self.emoji = emoji
+        self.color = color
+        self.completeAt = completeAt
+    }
+
+    func completed(date: Date) {
         completeAt.append(date)
         print("✅Tracker \"\(name)\" is completed.")
     }
