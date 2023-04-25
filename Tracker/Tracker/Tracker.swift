@@ -11,5 +11,10 @@ struct Tracker {
     let schedule: [WeekDay]?
     let emoji: String
     let color: Colors
-    let completeAt: [Date]?
+    var completeAt: [Date] = []
+
+    mutating func completed(date: Date) {
+        completeAt.append(date)
+        print("✅Tracker \"\(name)\" is completed.")
+    }
 }

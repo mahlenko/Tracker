@@ -183,7 +183,7 @@ class TrackerViewController: UIViewController {
             schedule: [],
             emoji: emojiList.first!,
             color: Colors.allCases.randomElement()!,
-            completeAt: nil)
+            completeAt: [])
     }
 
     override var tabBarItem: UITabBarItem! {

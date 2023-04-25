@@ -16,7 +16,12 @@ final class TrackerCell: UICollectionViewCell {
     private let completedLabel = UILabel()
     private let completedButtonView = UIButton()
 
+    private var tracker: Tracker?
+
     func setupForTracking(tracker: Tracker) {
+
+        self.tracker = tracker
+
         // add subviews
         completionRowView.addSubview(completedLabel)
         completionRowView.addSubview(completedButtonView)
@@ -63,12 +68,18 @@ final class TrackerCell: UICollectionViewCell {
         completedButtonView.backgroundColor = UIColor.init(rgb: tracker.color.rawValue)
         completedButtonView.setImage(UIImage(systemName: "plus"), for: .normal)
         completedButtonView.tintColor = UIColor(named: "White")
+        completedButtonView.addTarget(self, action: #selector(trackerCompleted), for: .touchUpInside)
 
         completedLabel.translatesAutoresizingMaskIntoConstraints = false
         completedLabel.font = .systemFont(ofSize: 14)
-        completedLabel.text = (tracker.completeAt?.count ?? 0).toStringChoice("день", "дня", "дней")
+        completedLabel.text = (tracker.completeAt.count).toStringChoice("день", "дня", "дней")
 
         configureConstraints()
+    }
+
+    @objc func trackerCompleted(_ sender: UIButton) {
+        tracker?.completed(date: Date())
+        completedLabel.text = (tracker?.completeAt.count)?.toStringChoice("день", "дня", "дней")
     }
 
     private func configureConstraints() {
