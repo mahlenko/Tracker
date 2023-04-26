@@ -7,7 +7,17 @@ import UIKit
 
 extension TrackerViewController: TrackerPresenterProtocol, UISearchBarDelegate, UISearchControllerDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        print("Search: \(searchText)")
+        let itemsFilter = items.filter { tracker in
+            tracker.name.lowercased().contains(searchText.lowercased())
+        }
+
+        if searchText.count > 0 {
+            resultSections = willCollectSections(categories: categories, trackers: itemsFilter)
+        } else {
+            resultSections = willCollectSections(categories: categories, trackers: items)
+        }
+
+        collectionTracker?.collection.reloadData()
     }
 
     @objc func changeDate(sender: UIDatePicker) {
@@ -38,7 +48,7 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout {
 
 extension TrackerViewController: UICollectionViewDataSource {
     public func numberOfSections(in collectionView: UICollectionView) -> Int {
-        sections.count
+        resultSections.count
     }
 
     func collectionView(
@@ -52,7 +62,7 @@ extension TrackerViewController: UICollectionViewDataSource {
             _ collectionView: UICollectionView,
             viewForSupplementaryElementOfKind kind: String,
             at indexPath: IndexPath) -> UICollectionReusableView {
-        let section = sections[indexPath.section]
+        let section = resultSections[indexPath.section]
 
         //
         switch kind {
@@ -72,7 +82,7 @@ extension TrackerViewController: UICollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        sections[section].items?.count ?? 0
+        resultSections[section].items?.count ?? 0
     }
 
     func collectionView(
@@ -82,7 +92,7 @@ extension TrackerViewController: UICollectionViewDataSource {
                 withReuseIdentifier: TrackerCell.identifier,
                 for: indexPath) as? TrackerCell
 
-        let section = sections[indexPath.section]
+        let section = resultSections[indexPath.section]
         let tracker = section.items?[indexPath.row]
 
         cell?.setupForTracking(tracker: tracker!)
@@ -102,7 +112,34 @@ class TrackerViewController: UIViewController {
         Category.init(uuid: UUID(), name: "Самочувствие")
     ]
 
-    private lazy var items = {
+    private var sections: [CollectionSection] = []
+    private var resultSections: [CollectionSection] = []
+
+    private var items: [Tracker] = []
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.title = tabBarItem.title
+
+        let datePicker = DatePickerController(presenter: self).register()
+        datePicker.picker.addTarget(self, action: #selector(changeDate(sender:)), for: .valueChanged)
+        CreateTrackerButton(presenter: self).register()
+        SearchController(presenter: self).register()
+        collectionTracker = CollectionTracker(presenter: self).register()
+
+        items = fetchData()
+
+        if items.count > 0 {
+            sections = willCollectSections(categories: categories, trackers: items)
+            resultSections = sections
+
+            collectionTracker?.showEmptyDataView(visible: false)
+        }
+    }
+
+    private func fetchData() -> [Tracker] {
         [
             randomTracker(categories: categories)!,
             randomTracker(categories: categories)!,
@@ -119,39 +156,28 @@ class TrackerViewController: UIViewController {
             randomTracker(categories: categories)!,
             randomTracker(categories: categories)!
         ]
-    }()
-
-    private var sections: [CollectionSection] = []
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.title = tabBarItem.title
-
-        let datePicker = DatePickerController(presenter: self).register()
-        datePicker.picker.addTarget(self, action: #selector(changeDate(sender:)), for: .valueChanged)
-        CreateTrackerButton(presenter: self).register()
-        SearchController(presenter: self).register()
-        collectionTracker = CollectionTracker(presenter: self).register()
-
-        if items.count > 0 {
-            buildSections(categories: categories, trackers: items)
-            collectionTracker?.showEmptyDataView(visible: false)
-        }
     }
 
-    private func buildSections(categories: [Category], trackers: [Tracker]) {
+    // Will collect data in the sections
+    private func willCollectSections(categories: [Category], trackers: [Tracker]) -> [CollectionSection] {
         let groupTrackers = Dictionary(grouping: trackers, by: { $0.categoryUuid })
 
+        var collection: [CollectionSection] = []
         groupTrackers.forEach { (categoryUuid: UUID, trackers: [Tracker]) in
             let category = categories.first { $0.uuid == categoryUuid }
             if let category = category {
-                sections.append(CollectionSection(category: category, items: trackers))
+                collection.append(CollectionSection(category: category, items: trackers))
             }
         }
+
+        collection.sort { section, section2 in
+            section.category.name < section2.category.name
+        }
+
+        return collection
     }
 
+    // Mock data set
     private func randomTracker(categories: [Category]) -> Tracker? {
         var emojiList = [
             "🍇", "🍈", "🍉", "🍊", "🍋",
